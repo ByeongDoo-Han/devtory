@@ -1,13 +1,13 @@
 package io.devtory.devtory3.service
 
-import io.devtory.devtory3.common.PasswordEncoder
+import io.devtory.devtory3.security.PasswordEncoder
 import io.devtory.devtory3.domain.User
-import io.devtory.devtory3.dto.RegisterRequest
-import io.devtory.devtory3.dto.RegisterResponse
+import io.devtory.devtory3.dto.*
 import io.devtory.devtory3.entity.UserEntity
 import io.devtory.devtory3.exception.DuplicateEmailException
 import io.devtory.devtory3.exception.DuplicateNicknameException
 import io.devtory.devtory3.repository.UserRepository
+import io.devtory.devtory3.security.JwtTokenProvider
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -63,5 +63,13 @@ class AuthService(
             nickname = user.nickname,
             email = user.email
         )
+    }
+
+    fun login(request: LoginRequest): TokenResponse {
+        TODO("Not yet implemented")
+    }
+
+    fun refreshToken(request: RefreshTokenRequest): TokenResponse {
+        TODO("Not yet implemented")
     }
 }

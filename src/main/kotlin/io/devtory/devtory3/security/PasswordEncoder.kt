@@ -1,4 +1,4 @@
-package io.devtory.devtory3.common
+package io.devtory.devtory3.security
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 

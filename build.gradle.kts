@@ -12,7 +12,7 @@ description = "devtory3"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -21,12 +21,33 @@ repositories {
 }
 
 dependencies {
+    // jpa
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    // security
     implementation("org.springframework.boot:spring-boot-starter-security")
+
+    // web
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // jackson kotlin module
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    // kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    // db
     runtimeOnly("com.mysql:mysql-connector-j")
+
+    // validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    // lombok
+    compileOnly("org.projectlombok:lombok:1.18.42")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
+    testCompileOnly("org.projectlombok:lombok:1.18.42")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.42")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
@@ -37,12 +58,6 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
-}
-
-allOpen {
-    annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("jakarta.persistence.Embeddable")
 }
 
 tasks.withType<Test> {

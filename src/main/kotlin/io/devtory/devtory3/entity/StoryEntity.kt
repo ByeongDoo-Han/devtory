@@ -1,6 +1,7 @@
 package io.devtory.devtory3.entity
 
 import jakarta.persistence.*
+import java.time.Instant
 import java.time.LocalDateTime
 
 @Entity
@@ -8,8 +9,7 @@ import java.time.LocalDateTime
     name = "stories",
     indexes = [
         Index(name = "idx_slug", columnList = "slug", unique = true),
-        Index(name = "idx_author", columnList = "author_id"),
-        Index(name = "idx_published", columnList = "published_at")
+        Index(name = "idx_author", columnList = "author_id")
     ]
 )
 class StoryEntity(
@@ -43,10 +43,10 @@ class StoryEntity(
     val author: UserEntity? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: Instant = Instant.now()
 )
 
 enum class VisibilityEntity {

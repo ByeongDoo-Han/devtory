@@ -1,8 +1,13 @@
 package io.devtory.devtory3.entity
 
+import io.devtory.devtory3.domain.User
+import io.devtory.devtory3.domain.UserRole
 import jakarta.persistence.*
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.util.*
 
 @Entity
 @Table(
@@ -14,41 +19,56 @@ import java.time.LocalDateTime
 )
 class UserEntity(
     @Id
-    val id: String?,
+    @Column(name = "id", columnDefinition = "CHAR(36)")
+    val id: String = UUID.randomUUID().toString(),
 
     @Column(name = "nickname", nullable = false, unique = true, length = 10)
-    val nickname: String?,
+    var nickname: String,
 
     @Column(name = "email", nullable = false, unique = true, length = 255)
-    val email: String?,
+    val email: String,
 
     @Column(name = "password_hash", nullable = false, length = 255)
-    val passwordHash: String?,
+    var passwordHash: String,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
     var role: UserRoleEntity = UserRoleEntity.USER,
 
     @Column(name = "profile_image_url", length = 500)
-    val profileImageUrl: String? = null,
+    var profileImageUrl: String? = null,
 
     @Column(name = "last_story_created_at")
-    var lastStoryCreatedAt: LocalDate? = null,
+    var lastStoryCreatedAt: Instant? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: Instant = Instant.now(),
 
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now()
+    var updatedAt: Instant = Instant.now()
 ){
+    fun toDomain():User{
+        return User(
+            id = id,
+            nickname = nickname,
+            email = email,
+            passwordHash = passwordHash,
+            role = when(role){
+                UserRoleEntity.USER -> UserRole.USER
+                UserRoleEntity.ADMIN -> UserRole.ADMIN
+            },
+            profileImageUrl = profileImageUrl,
+            lastStoryCreatedAt = LocalDateTime.ofInstant(lastStoryCreatedAt, ZoneOffset.UTC),
+            createdAt = LocalDateTime.ofInstant(createdAt, ZoneOffset.UTC),
+            updatedAt = LocalDateTime.ofInstant(updatedAt, ZoneOffset.UTC)
+        )
+    }
     companion object{
         fun forInsert(
-            id: String,
             nickname: String,
             passwordHash: String,
             email: String,
         ): UserEntity = UserEntity(
-            id = id,
             email = email,
             nickname = nickname,
             passwordHash = passwordHash,

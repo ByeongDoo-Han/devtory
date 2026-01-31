@@ -3,14 +3,15 @@ package io.devtory.devtory3.domain
 import java.time.LocalDateTime
 
 data class User(
+    val id: String? = null,
     val nickname: String,
     val email: String,
     val passwordHash: String,
     val profileImageUrl: String? = null,
     val role: UserRole,
-    val lastStoryCreatedAt:LocalDateTime?,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val lastStoryCreatedAt:LocalDateTime? = null,
+    val createdAt: LocalDateTime? = null,
+    val updatedAt: LocalDateTime? = null
 ) {
     companion object {
         fun create(
@@ -23,9 +24,6 @@ data class User(
                 email = email,
                 role = UserRole.USER,
                 passwordHash = passwordHash,
-                lastStoryCreatedAt = null,
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
             )
         }
     }

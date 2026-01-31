@@ -1,13 +1,16 @@
 package io.devtory.devtory3.service
 
-import io.devtory.devtory3.security.PasswordEncoder
 import io.devtory.devtory3.domain.User
 import io.devtory.devtory3.dto.*
 import io.devtory.devtory3.entity.UserEntity
 import io.devtory.devtory3.exception.DuplicateEmailException
 import io.devtory.devtory3.exception.DuplicateNicknameException
+import io.devtory.devtory3.exception.UserNotFoundException
 import io.devtory.devtory3.repository.UserRepository
 import io.devtory.devtory3.security.JwtTokenProvider
+import io.devtory.devtory3.security.PasswordEncoder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -44,32 +47,55 @@ class AuthService(
             passwordHash = passwordHash,
         )
 
-        // UUID 생성
-        val userId = java.util.UUID.randomUUID().toString()
-
         // 새 엔티티 생성
         val entityToSave = UserEntity.forInsert(
-            id = userId,
             email = user.email,
             nickname = user.nickname,
             passwordHash = user.passwordHash,
         )
 
         // 저장
-        userRepository.save(entityToSave)
+        val savedUser = userRepository.save(entityToSave)
 
         return RegisterResponse(
-            id = userId,
-            nickname = user.nickname,
-            email = user.email
+            id = savedUser.id,
+            nickname = savedUser.nickname,
+            email = savedUser.email
         )
     }
 
-    fun login(request: LoginRequest): TokenResponse {
-        TODO("Not yet implemented")
+    suspend fun login(request: LoginRequest): TokenResponse {
+        val userEntity = withContext(Dispatchers.IO) {
+            userRepository.findByEmail(request.email)
+        } ?:throw UserNotFoundException(request.email)
+
+        val accessToken = jwtTokenProvider.createAccessToken(userEntity.id, userEntity.email, userEntity.role.name)
+        val refreshToken = jwtTokenProvider.createRefreshToken(userEntity.id, userEntity.email, userEntity.role.name)
+
+        redisService.saveRefreshToken(userEntity.id, refreshToken)
+
+        return TokenResponse(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            userId = userEntity.id
+        )
     }
 
-    fun refreshToken(request: RefreshTokenRequest): TokenResponse {
-        TODO("Not yet implemented")
+    suspend fun refreshToken(request: RefreshTokenRequest): TokenResponse {
+        redisService.deleteRefreshToken(request.refreshToken)
+        val userId = jwtTokenProvider.getUserIdFromToken(request.refreshToken)
+        val email = jwtTokenProvider.getEmailFromToken(request.refreshToken)
+        val role = jwtTokenProvider.getRoleFromToken(request.refreshToken)
+
+        val accessToken = jwtTokenProvider.createAccessToken(userId,email,role)
+        val refreshToken = jwtTokenProvider.createRefreshToken(userId,email,role)
+
+        redisService.saveRefreshToken(userId, refreshToken)
+
+        return TokenResponse(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            userId = userId
+        )
     }
 }

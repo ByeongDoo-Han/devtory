@@ -32,7 +32,7 @@ data class LoginRequest(
 data class TokenResponse(
     val accessToken: String,
     val refreshToken: String,
-    val userId: Long
+    val userId: String
 )
 
 /**

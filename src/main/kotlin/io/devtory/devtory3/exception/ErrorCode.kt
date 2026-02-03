@@ -15,6 +15,7 @@ enum class ErrorCode(httpStatus: HttpStatus, errorCode: String, errormessage: St
 
     USER_ALREADY_EXISTED(HttpStatus.CONFLICT, "AUTH-008", "User already existed."),
     NICKNAME_ALREADY_EXISTED(HttpStatus.CONFLICT, "AUTH-009", "Nickname already existed."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH-010", "Refresh token not found."),
     ;
 
     val status: HttpStatus = httpStatus

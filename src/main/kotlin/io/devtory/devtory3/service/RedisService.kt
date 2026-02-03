@@ -20,9 +20,9 @@ class RedisService(
     /**
      * Refresh Token 조회
      */
-    suspend fun getRefreshToken(userId: String): String? {
+    suspend fun getRefreshToken(email: String): String? {
         val bucket =
-            redissonClient.getBucket<String>(REFRESH_TOKEN_PREFIX + userId)
+            redissonClient.getBucket<String>(REFRESH_TOKEN_PREFIX + email)
         return bucket.get()
     }
 

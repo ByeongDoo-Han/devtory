@@ -30,15 +30,15 @@ class JwtTokenProvider(
     /**
      * Access Token 생성
      */
-    fun createAccessToken(userId: String, email:String, role: String): String {
+    fun createAccessToken(authentication : Authentication): String {
+        val authorities = authentication.authorities.joinToString(",") { it.authority }
         val now = Date()
         val expiryDate = Date(now.time + ACCESS_TOKEN_EXPIRATION)
 
         return Jwts.builder()
-            .subject(userId)
-            .claim("role", role)
-            .claim("email", email)
-            .claim("type", "access")
+            .subject(authentication.name)
+            .claim(AUTHORITIES_KEY, authorities)
+            .claim(TOKEN_TYPE, ACCESS)
             .issuedAt(now)
             .expiration(expiryDate)
             .signWith(key)
@@ -48,15 +48,15 @@ class JwtTokenProvider(
     /**
      * Refresh Token 생성
      */
-    fun createRefreshToken(userId: String, email: String, role: String): String {
+    fun createRefreshToken(authentication:Authentication): String {
+        val authorities = authentication.authorities.joinToString(",") { it.authority }
         val now = Date()
         val expiryDate = Date(now.time + REFRESH_TOKEN_EXPIRATION)
 
         return Jwts.builder()
-            .subject(userId)
-            .claim("role", role)
-            .claim("email", email)
-            .claim("type", "refresh")
+            .subject(authentication.name)
+            .claim(AUTHORITIES_KEY, authorities)
+            .claim(TOKEN_TYPE, REFRESH)
             .issuedAt(now)
             .expiration(expiryDate)
             .signWith(key)
@@ -85,18 +85,6 @@ class JwtTokenProvider(
     }
 
     /**
-     * 토큰 검증
-     */
-    fun validateToken(token: String): Boolean {
-        return try {
-            getClaims(token)
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    /**
      * 토큰 타입 확인 (access/refresh)
      */
     fun getTokenType(token: String): String? {
@@ -118,14 +106,14 @@ class JwtTokenProvider(
     // Token에 담겨있는 정보를 이용해 Authentication 객체를 리턴
     fun getAuthentication(token: String?): Authentication? {
         val claims: Claims = getClaims(token!!)
-        val authorities: Collection<GrantedAuthority?> = Arrays.stream<String>(
+        val authorities: Collection<GrantedAuthority?> = Arrays.stream(
             claims[AUTHORITIES_KEY].toString().split(",".toRegex())
                 .dropLastWhile { it.isEmpty() }
                 .toTypedArray())
             .filter { str: String? ->
                 StringUtils.hasText(str)
             }
-            .map<SimpleGrantedAuthority?> { role: String? ->
+            .map { role: String? ->
                 SimpleGrantedAuthority(
                     role
                 )
@@ -156,5 +144,9 @@ class JwtTokenProvider(
     companion object{
         private val LOGGER: Logger = LoggerFactory.getLogger(JwtTokenProvider::class.java.toString())
         const val AUTHORITIES_KEY: String = "auth"
+        const val TOKEN_TYPE:String = "type"
+        const val ACCESS:String = "access"
+        const val REFRESH:String = "refresh"
+        const val ROLE:String = "role"
     }
 }

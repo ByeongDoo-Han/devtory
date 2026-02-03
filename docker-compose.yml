@@ -47,6 +47,11 @@ services:
       - DB_NAME=devtory3
       - DB_USER=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_TOKEN_EXPIRATION=${JWT_ACCESS_TOKEN_EXPIRATION}
+      - JWT_REFRESH_TOKEN_EXPIRATION=${JWT_REFRESH_TOKEN_EXPIRATION}
     depends_on:
       mysql:
         condition: service_healthy
@@ -59,3 +64,4 @@ networks:
 
 volumes:
   mysql_data:
+  redis_data:

@@ -31,13 +31,5 @@ data class LoginRequest(
  */
 data class TokenResponse(
     val accessToken: String,
-    val refreshToken: String,
-    val userId: String
-)
-
-/**
- * Refresh Token 요청
- */
-data class RefreshTokenRequest(
-    val refreshToken: String
+    val refreshToken: String?
 )

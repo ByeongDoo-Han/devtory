@@ -13,6 +13,10 @@ data class User(
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null
 ) {
+    init{
+        require(nickname.length in 2..10) { "Nickname must be between 2 and 10 characters." }
+
+    }
     companion object {
         fun create(
             nickname: String,
